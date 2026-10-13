@@ -78,14 +78,23 @@ async def main():
         )
 
         # ========================================================
-        # STAGE 6: Extract text content from the tool result
+        # STAGE 6: Extract the actual file content from the result
         # ========================================================
 
-        tool_result = "\n".join(
-            item.text
-            for item in result.content
-            if hasattr(item, "text")
-        )
+        file_contents = []
+
+        for item in result.content:
+
+            # Direct text content
+            if hasattr(item, "text"):
+                file_contents.append(item.text)
+
+            # Embedded resource content
+            elif hasattr(item, "resource"):
+                resource = item.resource
+
+                if hasattr(resource, "text"):
+                    file_contents.append(resource.text)
 
         # ========================================================
         # STAGE 7: Display the file contents
@@ -94,7 +103,8 @@ async def main():
         print("\n======================================")
         print("GITHUB FILE CONTENT")
         print("======================================")
-        print(tool_result)
+
+        print("\n".join(file_contents))
 
 
 asyncio.run(main())
